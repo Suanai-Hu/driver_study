@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/hhr/ws/RK3568/kernel/include",
+                "/home/hhr/ws/RK3568/kernel/arch/arm64/include",
+                "/home/hhr/ws/RK3568/kernel/arch/arm/include",
+                "/home/hhr/ws/RK3568/kernel/arch/arm64/include/generated",
+                "/home/hhr/ws/RK3568/kernel/include/uapi",
+                "/home/hhr/ws/RK3568/kernel/include/miscdevice.h"
+            ],
+            "defines": [
+                "KBUILD_MODNAME=\"hello_module\"",
+                "__GNUC__",
+                "__KERNEL__",
+                "MODULE"
+            ],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "linux-gcc-x64",
+            "configurationProvider": "ms-vscode.makefile-tools"
+        }
+    ],
+    "version": 4
+}

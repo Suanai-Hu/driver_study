@@ -1,0 +1,1 @@
+cmd_/home/hhr/test/03_dev_t/dev_t.ko := /home/hhr/ws/RK3568/prebuilts/gcc/linux-x86/aarch64/gcc-linaro-6.3.1-2017.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-ld -r  -EL  -maarch64elf -T ./scripts/module-common.lds -T ./arch/arm64/kernel/module.lds  --build-id  -o /home/hhr/test/03_dev_t/dev_t.ko /home/hhr/test/03_dev_t/dev_t.o /home/hhr/test/03_dev_t/dev_t.mod.o ;  true
