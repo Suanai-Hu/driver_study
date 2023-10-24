@@ -486,3 +486,9 @@ Linux有一个很重要的概念叫一切皆文件，也就是Linux中的设备�
 			- 函数原型：<font color=blue>`int misc_deregister(struct miscdevice *misc)`</font>
 			- 参数：杂项设备的结构体指针
 			- 返回值：成功返回0，失败返回负数
+
+### Linux驱动错误处理
+1. 内核中保留了地址0xfffffffffff000 ~ 0xffffffffffffffff(64位系统)用来记录错误码，这段地址与Linux错误码是一一对应的，内核基本错误码保存在errn-base.h文件中。
+2. 内核中的函数常常返回指针，如果内核中返回一个指针，会出现三种情况：合法指针、NULL指针、非法指针。
+	1. 使用<font color=blue>`IS_ERR`</font>函数去检查函数的返回值，如果地址落在0xfffffffffff000 ~ 0xffffffffffffffff范围内，表示该函数执行失败，<font color=blue>`IS_ERR`</font>为1，同时该函数返回的错误地址对应一个Linux错误号。
+	2. 如果想知道这个地址是那个错误码，就用<font color=blue>`PTR_ERR`</font>函数来转化，其中，<font color=blue>`IS_ERR`</font>和<font color=blue>`PTR_ERR`</font>函数定义在errno.h中。

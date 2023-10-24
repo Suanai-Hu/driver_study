@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "module.h": "c",
+        "init.h": "c",
+        "elf.h": "c",
+        "moduleparam.h": "c",
+        "fs.h": "c",
+        "kdev_t.h": "c",
+        "wait_bit.h": "c"
+    }
+    "C_Cpp.intelliSenseEngineFallback": "Disabled", //需要添加的
+    "C_Cpp.intelliSenseEngine": "Tag Parser",  //  需要添加的
+}

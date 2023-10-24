@@ -8,6 +8,9 @@
 #include <linux/device.h>
 #include <linux/uaccess.h>
 #include <linux/errno.h>
+#include <linux/io.h>
+
+#define GPIO_DR 0xFDD60000      // GPIO0的基地址
 
 struct device_test{
     dev_t dev_num;
@@ -17,6 +20,7 @@ struct device_test{
     struct class *class;
     struct device *device;
     char kbuf[1024];
+    unsigned int *vir_gpio_dr;
 };
 
 struct device_test dev1;
@@ -49,6 +53,19 @@ static ssize_t cdev_test_write(struct file *file, const char __user *buf, size_t
         return -1;
     }
 
+    if(test_dev->kbuf[0] == 1)
+    {
+        // 亮灯
+        *(test_dev->vir_gpio_dr) = 0x8000c040;
+        printk("test_dev->kbuf[0] is %d\n", test_dev->kbuf[0]);
+    }
+    else if(test_dev->kbuf[0] == 0)
+    {
+        // 灭灯
+        *(test_dev->vir_gpio_dr) = 0x80004040;
+        printk("test_dev->kbuf[0] is %d\n", test_dev->kbuf[0]);
+    }
+
     printk("test_dev->kbuf is %s\n", test_dev->kbuf);
 
     return 0;
@@ -59,6 +76,7 @@ static int cdev_test_release(struct inode *inode, struct file *file)
     return 0;
 }
 
+// 构建file_operations结构体
 struct file_operations cdev_test_ops = {
     .owner = THIS_MODULE,
     .open = cdev_test_open,
@@ -67,10 +85,12 @@ struct file_operations cdev_test_ops = {
     .release = cdev_test_release
 };
 
+// 
 static int modulecdev_init(void)
 {
     int ret;
 
+    // 动态分配设备号
     ret = alloc_chrdev_region(&dev1.dev_num, 0, 1, "alloc_name");
     if(ret < 0)
     {
@@ -108,19 +128,30 @@ static int modulecdev_init(void)
         goto err_device_create;
     }
 
+    // 转换物理地址为虚拟地址，使用ioremap函数，转换4个字节
+    dev1.vir_gpio_dr = ioremap(GPIO_DR, 4);
+    if(IS_ERR(dev1.vir_gpio_dr))
+    {
+        ret = PTR_ERR(dev1.vir_gpio_dr);
+        goto err_ioremap;
+    }
+
     return 0;
 
-    err_device_create:
-        class_destroy(dev1.class);
+err_ioremap:
+    iounmap(dev1.vir_gpio_dr);
 
-    err_class_create:
-        cdev_del(&dev1.cdev_test);
+err_device_create:
+    class_destroy(dev1.class);
 
-    err_chr_add:
-        unregister_chrdev_region(dev1.dev_num, 1);
+err_class_create:
+    cdev_del(&dev1.cdev_test);
 
-    err_chrdev:
-        return ret;
+err_chr_add:
+    unregister_chrdev_region(dev1.dev_num, 1);
+
+err_chrdev:
+    return ret;
 }
 
 static void modulecdev_exit(void)
@@ -130,6 +161,7 @@ static void modulecdev_exit(void)
 
     device_destroy(dev1.class, dev1.dev_num);
     class_destroy(dev1.class);
+    iounmap(dev1.vir_gpio_dr);
 
     printk("bye bye\n");
 }
